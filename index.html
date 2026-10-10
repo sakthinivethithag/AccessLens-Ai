@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en"
+      data-dark="{{ 'on' if prefs.dark_mode else 'off' }}"
+      data-contrast="{{ 'on' if prefs.high_contrast else 'off' }}"
+      style="--reader-size: {{ prefs.font_size }}px; --reader-lh: {{ prefs.line_spacing }};">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AccessLens AI – Accessibility that adapts to you</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">&#9673;</span>
+      <div>
+        <h1>AccessLens AI</h1>
+        <p class="tagline">Accessibility that adapts to you.</p>
+      </div>
+    </div>
+    <p id="statusMessage" class="status" role="status" aria-live="polite"></p>
+  </header>
+
+  <main id="main">
+    <section aria-labelledby="statsTitle">
+      <h2 id="statsTitle" class="sr-only">Dashboard statistics</h2>
+      <div class="stats-grid">
+        <div class="card stat"><span class="stat-value" id="statTotal">0</span><span class="stat-label">Texts processed</span></div>
+        <div class="card stat"><span class="stat-value" id="statWords">0</span><span class="stat-label">Words analysed</span></div>
+        <div class="card stat"><span class="stat-value" id="statSentence">&mdash;</span><span class="stat-label">Avg. shorter sentences (words)</span></div>
+        <div class="card stat"><span class="stat-value" id="statEase">&mdash;</span><span class="stat-label">Avg. reading-ease gain (points)</span></div>
+        <div class="card stat"><span class="stat-value" id="statHighlights">0</span><span class="stat-label">Important items highlighted</span></div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <div class="column">
+        <section class="card" aria-labelledby="inputTitle">
+          <h2 id="inputTitle">1. Your text</h2>
+          <label for="textInput" class="field-label">Paste difficult text (legal, medical, academic, official letters...)</label>
+          <textarea id="textInput" class="reader-text" rows="8" placeholder="Paste or type text here..."></textarea>
+          <div class="row between">
+            <span id="charCount" class="hint">0 / 20,000 characters</span>
+            <span id="inputError" class="error" role="alert"></span>
+          </div>
+          <div class="row wrap">
+            <button id="simplifyBtn" class="btn primary" type="button">Simplify &amp; highlight</button>
+            <button id="sampleBtn" class="btn" type="button">Load sample text</button>
+            <button id="clearBtn" class="btn" type="button">Clear text</button>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="resultTitle">
+          <h2 id="resultTitle">2. Simplified result</h2>
+          <div id="output" class="output reader-text" tabindex="0" aria-label="Simplified text">
+            <p class="placeholder">Your simplified text will appear here.</p>
+          </div>
+          <div id="metrics" class="metrics" aria-live="polite"></div>
+          <ul class="legend" aria-label="Highlight legend">
+            <li><mark class="hl hl-date">Date</mark></li>
+            <li><mark class="hl hl-deadline">Deadline</mark></li>
+            <li><mark class="hl hl-warning">Warning</mark></li>
+            <li><mark class="hl hl-keyword">Key term</mark></li>
+            <li><mark class="hl hl-number">Number</mark></li>
+          </ul>
+          <div class="row wrap">
+            <button id="readingBtn" class="btn primary" type="button" disabled>Open reading mode</button>
+            <button id="copyBtn" class="btn" type="button" disabled>Copy simplified text</button>
+          </div>
+        </section>
+
+        <section class="card" aria-labelledby="historyTitle">
+          <div class="row between">
+            <h2 id="historyTitle">History</h2>
+            <button id="clearHistoryBtn" class="btn small danger" type="button" disabled>Clear all</button>
+          </div>
+          <p id="historyEmpty" class="placeholder">Nothing here yet. Simplify some text and it will be saved.</p>
+          <ul id="historyList" class="history-list"></ul>
+        </section>
+      </div>
+
+      <aside class="column">
+        <section class="card" aria-labelledby="settingsTitle">
+          <h2 id="settingsTitle">Accessibility settings</h2>
+          <p class="hint">Saved automatically to the database and re-applied every time you open the app.</p>
+
+          <div class="setting">
+            <label for="fontRange" class="field-label">Font size: <output id="fontValue">18</output> px</label>
+            <div class="row">
+              <button id="fontDown" class="btn small" type="button" aria-label="Decrease font size">A&minus;</button>
+              <input id="fontRange" type="range" min="14" max="32" step="1" value="18">
+              <button id="fontUp" class="btn small" type="button" aria-label="Increase font size">A+</button>
+            </div>
+          </div>
+
+          <div class="setting">
+            <label for="spacingRange" class="field-label">Line spacing: <output id="spacingValue">1.6</output></label>
+            <input id="spacingRange" type="range" min="1.2" max="2.4" step="0.1" value="1.6">
+          </div>
+
+          <div class="setting">
+            <label class="check"><input id="darkToggle" type="checkbox"> Dark mode</label>
+            <label class="check"><input id="contrastToggle" type="checkbox"> High-contrast mode</label>
+          </div>
+
+          <button id="resetBtn" class="btn" type="button">Reset to defaults</button>
+        </section>
+
+        <section class="card note" aria-labelledby="aboutTitle">
+          <h2 id="aboutTitle">How it works</h2>
+          <p>AccessLens uses <strong>rule-based text processing</strong>: word lists, sentence splitting and pattern matching written in Python. It is <strong>not a trained AI model</strong>, so always check important text yourself.</p>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Distraction-free reading mode -->
+  <div id="readingOverlay" class="reading-overlay" role="dialog" aria-modal="true" aria-labelledby="readingTitle" hidden>
+    <div class="reading-toolbar">
+      <h2 id="readingTitle">Reading mode</h2>
+      <div class="row">
+        <button id="readingFontDown" class="btn small" type="button" aria-label="Decrease font size">A&minus;</button>
+        <button id="readingFontUp" class="btn small" type="button" aria-label="Increase font size">A+</button>
+        <button id="closeReadingBtn" class="btn small primary" type="button">Close (Esc)</button>
+      </div>
+    </div>
+    <article id="readingContent" class="reading-content reader-text"></article>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>window.INITIAL_PREFS = {{ prefs|tojson }};</script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>
