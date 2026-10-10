@@ -74,19 +74,3 @@ accesslens-ai/
 | DELETE | `/api/history`             | Clear all history                   |
 | GET    | `/api/stats`               | Dashboard numbers from the database |
 
-## Hackathon demo script 
-
-1. Open the app and point out the status message: settings were applied automatically.
-2. Click **Load sample text**, then **Simplify & highlight**.
-3. Show the before/after readability numbers and the colour-coded highlights.
-4. Increase font size, raise line spacing, switch on dark and high-contrast mode.
-5. Refresh the page: your settings are still there (loaded from SQLite).
-6. Open **reading mode**, then close it with Esc.
-7. Show the history list and how the dashboard numbers changed.
-
-## Known limitations
-
-- The dictionary is small, so only some words are replaced.
-- Sentence splitting is basic and can mis-split after abbreviations such as "Dr.".
-- English only. The readability score uses a rough syllable estimate.
-- One shared set of preferences (there are no user accounts).
