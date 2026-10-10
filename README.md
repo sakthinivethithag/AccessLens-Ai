@@ -74,7 +74,7 @@ accesslens-ai/
 | DELETE | `/api/history`             | Clear all history                   |
 | GET    | `/api/stats`               | Dashboard numbers from the database |
 
-## Hackathon demo script (about 2 minutes)
+## Hackathon demo script 
 
 1. Open the app and point out the status message: settings were applied automatically.
 2. Click **Load sample text**, then **Simplify & highlight**.
